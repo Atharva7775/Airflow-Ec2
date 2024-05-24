@@ -81,48 +81,46 @@ def main():
     
 
 # Create columns for the checkboxes
-st.title("Famiology Compute Engine")
-col1, col2 = st.columns(2)
+    st.title("Famiology Compute Engine")
+    col1, col2 = st.columns(2)
 
-with col1:
-    x_dataset = st.checkbox("Connect to X dataset")
-    y_dataset = st.checkbox("Connect to Y dataset")
+    with col1:  
+        x_dataset = st.checkbox("Connect to X dataset")
+        y_dataset = st.checkbox("Connect to Y dataset")
 
-with col2:
-    x_file= st.checkbox("Processed X file")
-    y_file = st.checkbox("Processed Y file")
+    with col2:
+        x_file= st.checkbox("Processed X file")
+        y_file = st.checkbox("Processed Y file")
 
     show = st.button("Generate Results")
     if show:
-        if x_file and x_dataset:
-            data = convert_df_to_excel(df)
-            print("Inside X dataset")
-            url = "http://ec2-18-224-192-110.us-east-2.compute.amazonaws.com:8080/api/v1/dags/compute_engine_dag.py/dagRuns"
-            trigger_dag(url)
-            st.success("DAG triggered successfully!")
+        if not (x_file or y_file) or not (x_dataset or y_dataset):
+            st.error("Please select the datasets to connect and process.")
+        else:
             st.markdown("<h2 style='text-align: center;'>Download Updated CSV</h2>", unsafe_allow_html=True)
-            st.download_button(
+            if x_file and x_dataset:
+                data = convert_df_to_excel(df)
+                print("Inside X dataset")
+                url = "http://ec2-18-224-192-110.us-east-2.compute.amazonaws.com:8080/api/v1/dags/compute_engine_dag.py/dagRuns"
+                trigger_dag(url)
+                st.success("DAG triggered successfully!")
+                # st.markdown("<h2 style='text-align: center;'>Download Updated CSV</h2>", unsafe_allow_html=True)
+                st.download_button(
                 label="Press to Download X processed file",
                 data=data,
-                file_name="Processed_X_file.xlsx",  # Update the file name here
-            # key='download-csv'
-            # mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
-        if y_file and y_dataset:
-            data = convert_df_to_excel_1(df1)
-            print("Inside Y dataset")
-            url = "http://ec2-18-224-192-110.us-east-2.compute.amazonaws.com:8080/api/v1/dags/compute_engine_dag.py/dagRuns"
-            trigger_dag(url)
-            st.download_button(
+                file_name="Processed_X_file.xlsx",
+                )
+            if y_file and y_dataset:
+                data = convert_df_to_excel_1(df1)
+                print("Inside Y dataset")
+                url = "http://ec2-18-224-192-110.us-east-2.compute.amazonaws.com:8080/api/v1/dags/compute_engine_dag.py/dagRuns"
+                trigger_dag(url)
+                st.success("DAG 'Processed_Y_file' triggered successfully!")
+                st.download_button(
                 label="Press to Download Y processed file",
                 data=data,
                 file_name="Processed_Y_file.xlsx",  # Update the file name here
-            )
-            st.success("DAG 'Processed_Y_file' triggered successfully!")
-    # st.title("Processed_Y_file")
-    # show_processed = st.button("Run Processed_Y_file")
-    # if show_processed:
-        
+                )
 
 if __name__ == "__main__":
     main()
