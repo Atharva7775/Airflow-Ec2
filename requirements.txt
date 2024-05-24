@@ -1,0 +1,7 @@
+pandas
+boto3
+openpyxl
+streamlit
+datetime
+requests
+uuid
